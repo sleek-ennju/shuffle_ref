@@ -25,30 +25,29 @@ export default function SetupScreen({ dispatch }: Props) {
 
   return (
     <div
-        style={{
-          minHeight: '100dvh',
-          width: '100%',
-          display: 'grid',
-          placeItems: 'center',
-          overflowX: 'hidden',
-          paddingTop: 'calc(16px + env(safe-area-inset-top))',
-          paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
-          paddingLeft: 'calc(16px + env(safe-area-inset-left))',
-          paddingRight: 'calc(16px + env(safe-area-inset-right))',
-          background:
-            'radial-gradient(900px 500px at 50% 10%, rgba(59,130,246,0.18), transparent), #0b0f14',
-          color: '#fff',
-        }}
-      >
+       style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'auto',
+        display: 'grid',
+        placeItems: 'center',
+        padding: 'calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))',
+        background:
+          'radial-gradient(900px 500px at 50% 10%, rgba(59,130,246,0.18), transparent), #0b0f14',
+        color: '#fff',
+      }}
+    >
       <div
         style={{
-        width: '100%',
-        maxWidth: 460,
-        borderRadius: 18,
-        padding: 18,
-        border: '1px solid rgba(255,255,255,0.10)',
-        background: 'rgba(17, 24, 38, 0.92)',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
+          width: '100%',
+          maxWidth: 520,
+          borderRadius: 20,
+          padding: 22,
+          border: '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(17, 24, 38, 0.92)',
+          boxShadow: '0 18px 60px rgba(0,0,0,0.55)',
       }}
       >
         <div style={{ marginBottom: 14 }}>
