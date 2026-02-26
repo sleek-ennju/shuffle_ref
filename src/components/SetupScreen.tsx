@@ -25,26 +25,31 @@ export default function SetupScreen({ dispatch }: Props) {
 
   return (
     <div
-      style={{
-        minHeight: '100vh',
-        display: 'grid',
-        placeItems: 'center',
-        padding: 16,
-        background:
-          'radial-gradient(900px 500px at 50% 10%, rgba(59,130,246,0.18), transparent), #0b0f14',
-        color: '#fff',
-      }}
-    >
+        style={{
+          minHeight: '100dvh',
+          width: '100%',
+          display: 'grid',
+          placeItems: 'center',
+          overflowX: 'hidden',
+          paddingTop: 'calc(16px + env(safe-area-inset-top))',
+          paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
+          paddingLeft: 'calc(16px + env(safe-area-inset-left))',
+          paddingRight: 'calc(16px + env(safe-area-inset-right))',
+          background:
+            'radial-gradient(900px 500px at 50% 10%, rgba(59,130,246,0.18), transparent), #0b0f14',
+          color: '#fff',
+        }}
+      >
       <div
         style={{
-          width: '100%',
-          maxWidth: 420,
-          borderRadius: 16,
-          padding: 18,
-          border: '1px solid rgba(255,255,255,0.10)',
-          background: 'rgba(17, 24, 38, 0.95)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
-        }}
+        width: '100%',
+        maxWidth: 460,
+        borderRadius: 18,
+        padding: 18,
+        border: '1px solid rgba(255,255,255,0.10)',
+        background: 'rgba(17, 24, 38, 0.92)',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
+      }}
       >
         <div style={{ marginBottom: 14 }}>
           <h2 style={{ margin: 0, fontSize: 20, letterSpacing: 0.2 }}>
