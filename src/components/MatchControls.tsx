@@ -14,25 +14,24 @@ export default function MatchControls({ state, dispatch }: Props) {
   const canEnd = hasMatch && (state.status === 'running' || state.status === 'paused');
 
   return (
-    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-      <button disabled={!canStart} onClick={() => dispatch({ type: 'START_MATCH' })}>
-        Start
-      </button>
+    <div className="stickyBar">
+      <div className="stickyInner">
+        <button className="btn primary" disabled={!canStart} onClick={() => dispatch({ type: 'START_MATCH' })}>
+          Start
+        </button>
 
-      <button disabled={!canPause} onClick={() => dispatch({ type: 'PAUSE_MATCH' })}>
-        Pause
-      </button>
+        <button className="btn" disabled={!canPause} onClick={() => dispatch({ type: 'PAUSE_MATCH' })}>
+          Pause
+        </button>
 
-      <button disabled={!canResume} onClick={() => dispatch({ type: 'RESUME_MATCH' })}>
-        Resume
-      </button>
+        <button className="btn" disabled={!canResume} onClick={() => dispatch({ type: 'RESUME_MATCH' })}>
+          Resume
+        </button>
 
-      <button
-        disabled={!canEnd}
-        onClick={() => dispatch({ type: 'END_MATCH', payload: { reason: 'refStop' } })}
-      >
-        End Match
-      </button>
+        <button className="btn danger" disabled={!canEnd} onClick={() => dispatch({ type: 'END_MATCH', payload: { reason: 'refStop' } })}>
+          End
+        </button>
+      </div>
     </div>
   );
 }

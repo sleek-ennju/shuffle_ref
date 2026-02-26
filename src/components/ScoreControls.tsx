@@ -9,20 +9,28 @@ export default function ScoreControls({ state, dispatch }: Props) {
   const disabled = !state.championId || !state.challengerId;
 
   return (
-    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-      <button
-        disabled={disabled}
-        onClick={() => dispatch({ type: 'GOAL_CHAMPION' })}
-      >
-        Goal Champion
-      </button>
+    <div className="card">
+      <div className="title">Goals</div>
+      <div className="btnRow">
+        <button
+          className="btn"
+          disabled={disabled}
+          onClick={() => dispatch({ type: 'GOAL_CHAMPION' })}
+        >
+          + Goal (Champion)
+        </button>
 
-      <button
-        disabled={disabled}
-        onClick={() => dispatch({ type: 'GOAL_CHALLENGER' })}
-      >
-        Goal Challenger
-      </button>
+        <button
+          className="btn"
+          disabled={disabled}
+          onClick={() => dispatch({ type: 'GOAL_CHALLENGER' })}
+        >
+          + Goal (Challenger)
+        </button>
+      </div>
+      <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>
+        Match auto-ends on a 2-goal lead.
+      </div>
     </div>
   );
 }

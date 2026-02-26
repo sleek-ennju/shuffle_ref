@@ -2,44 +2,43 @@ import type { MatchState } from '../matchEngine';
 import { teamNameById } from '../utils/teamNameById';
 import { formatTime } from '../utils/formatTime';
 
-type Props = {
-  state: MatchState;
-};
+type Props = { state: MatchState };
 
 export default function MatchHeader({ state }: Props) {
   const championName = teamNameById(state, state.championId);
   const challengerName = teamNameById(state, state.challengerId);
+  const showWarning = state.status === 'running' && state.secondsLeft <= 120;
 
   return (
-    <div
-      style={{
-        border: '1px solid #ddd',
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 12,
-      }}
-    >
-      <h2 style={{ marginTop: 0 }}>Current Match</h2>
+    <div className="card">
+      <div className="bigMatchRow">
+        <div className="bigTeams">
+          {championName} <span className="muted">vs</span> {challengerName}
+        </div>
+        <div className={`badge ${state.status}`}>{state.status.toUpperCase()}</div>
+      </div>
 
-      <p style={{ margin: 0 }}>
-        <strong>{championName}</strong> vs <strong>{challengerName}</strong>
-      </p>
+      <div className={`bigTime ${showWarning ? 'danger' : ''}`}>
+        {formatTime(state.secondsLeft)}
+      </div>
 
-      <p style={{ margin: '8px 0 0' }}>
-        Score: {state.goalsChampion} - {state.goalsChallenger}
-      </p>
+      <div className="bigScore">
+        <div className="scoreBox">
+          <div className="scoreLabel">
+            <span>{championName}</span>
+            <span className="muted">Champion</span>
+          </div>
+          <div className="scoreValue">{state.goalsChampion}</div>
+        </div>
 
-      <p style={{ margin: '8px 0 0' }}>
-        Planned duration: <strong>{state.durationPlanned}</strong> minutes
-      </p>
-
-      <p style={{ margin: '8px 0 0' }}>
-        Time left: <strong>{formatTime(state.secondsLeft)}</strong>
-      </p>
-
-      <p style={{ margin: '8px 0 0' }}>
-        Status: <strong>{state.status}</strong>
-      </p>
+        <div className="scoreBox">
+          <div className="scoreLabel">
+            <span>{challengerName}</span>
+            <span className="muted">Challenger</span>
+          </div>
+          <div className="scoreValue">{state.goalsChallenger}</div>
+        </div>
+      </div>
     </div>
   );
 }

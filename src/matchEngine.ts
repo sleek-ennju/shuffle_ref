@@ -78,6 +78,11 @@ export type TickEvent = {
   };
 };
 
+// Reset Team
+export type ResetSessionEvent = {
+  type: 'RESET_SESSION';
+};
+
 export interface MatchState {
   teams: TeamState[];
 
@@ -317,9 +322,9 @@ export function matchReducer(state: MatchState, event: MatchEvent): MatchState {
     case 'PAUSE_MATCH': {
         if (state.status !== 'running') return state;
         return { ...state, status: 'paused' };
-        }
+    }
 
-        case 'RESUME_MATCH': {
+    case 'RESUME_MATCH': {
         if (state.status !== 'paused') return state;
         return { ...state, status: 'running' };
     }
@@ -355,7 +360,7 @@ export function matchReducer(state: MatchState, event: MatchEvent): MatchState {
         }
 
         return { ...state, goalsChampion };
-        }
+    }
 
     case 'GOAL_CHALLENGER': {
         if (!state.championId || !state.challengerId) return state;
@@ -373,7 +378,124 @@ export function matchReducer(state: MatchState, event: MatchEvent): MatchState {
     }
 
     case 'END_MATCH': {
-        return resolveMatchEnd(state, event.payload.reason);
+      return resolveMatchEnd(state, event.payload.reason);
+    }
+
+    case 'ADD_TEAM': {
+      if (state.teams.length === 0) return state;
+
+      const rawName = event.payload?.name?.trim();
+      const name = rawName && rawName.length > 0 ? rawName : alphabetName(state.teams.length);
+
+      const id = makeTeamId(name);
+
+      // If ID already exists (e.g. someone adds "A"), make it unique
+      const exists = state.teams.some((t) => t.id === id);
+      const finalId = exists ? `${id}_${Date.now()}` : id;
+
+      const newTeam = { id: finalId, name };
+
+      return {
+        ...state,
+        teams: [...state.teams, newTeam],
+        mainQueue: [...state.mainQueue, finalId], // ✅ back of the queue
+      };
+    }
+
+    case 'RESET_SESSION': {
+      return initialState;
+    }
+
+    case 'REMOVE_TEAM': {
+      const removeId = event.payload.teamId;
+
+      // Remove from teams + queues
+      const teams = state.teams.filter((t) => t.id !== removeId);
+      let mainQueue = state.mainQueue.filter((id) => id !== removeId);
+      let cooldownQueue = state.cooldownQueue.filter((id) => id !== removeId);
+
+      const removingChampion = state.championId === removeId;
+      const removingChallenger = state.challengerId === removeId;
+
+      // If the removed team is not currently playing, just update lists
+      if (!removingChampion && !removingChallenger) {
+        return { ...state, teams, mainQueue, cooldownQueue };
+      }
+
+      // If fewer than 2 teams remain, clear match safely
+      if (teams.length < 2) {
+        return {
+          ...state,
+          teams,
+          mainQueue,
+          cooldownQueue,
+          championId: null,
+          challengerId: null,
+          goalsChampion: 0,
+          goalsChallenger: 0,
+          durationPlanned: 0,
+          secondsLeft: 0,
+          status: 'idle',
+        };
+      }
+
+      // ✅ Keep the remaining on-pitch team
+      const remainingId =
+        removingChampion ? state.challengerId : state.championId;
+
+      // Remaining should exist (unless both were somehow the same, which shouldn't happen)
+      if (!remainingId || remainingId === removeId) {
+        // Fallback: pick next two from queues
+        const rebuilt = {
+          ...state,
+          teams,
+          mainQueue,
+          cooldownQueue,
+          championId: null,
+          challengerId: null,
+          goalsChampion: 0,
+          goalsChallenger: 0,
+          status: 'idle' as const,
+        };
+
+        const { aId, bId, mainQueue: mq2, cooldownQueue: cq2 } = pullNextTwoTeams(
+          rebuilt.mainQueue,
+          rebuilt.cooldownQueue
+        );
+
+        const durationPlanned = rebuilt.isFirstMatch ? 15 : 10;
+
+        return {
+          ...rebuilt,
+          championId: aId,
+          challengerId: bId,
+          durationPlanned,
+          secondsLeft: durationPlanned * 60,
+          mainQueue: mq2,
+          cooldownQueue: cq2,
+        };
+      }
+
+      // ✅ Pick next opponent from mainQueue first, else recycle cooldown
+      const pulled = pullNextTeam(mainQueue, cooldownQueue);
+      mainQueue = pulled.mainQueue;
+      cooldownQueue = pulled.cooldownQueue;
+
+      const durationPlanned = state.isFirstMatch ? 15 : 10;
+
+      return {
+        ...state,
+        teams,
+        mainQueue,
+        cooldownQueue,
+        championId: remainingId,          // remaining team stays
+        challengerId: pulled.nextId,      // next opponent
+        goalsChampion: 0,
+        goalsChallenger: 0,
+        durationPlanned,
+        secondsLeft: durationPlanned * 60,
+        status: 'idle',
+      };
     }
 
     default:
@@ -391,4 +513,5 @@ export type MatchEvent =
   | EndMatchEvent
   | AddTeamEvent
   | RemoveTeamEvent
-  | TickEvent;
+  | TickEvent
+  | ResetSessionEvent;
